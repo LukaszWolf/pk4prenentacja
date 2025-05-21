@@ -1,0 +1,16 @@
+id: 120 img: customksztalt.png    name: helmet    type: HELMET      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 100
+id: 217 img: customksztalt.png    name: shield    type: ARMOR       strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 100
+id: 328 img: customksztalt.png    name: trousers  type: GLOVES      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 100
+id: 401 img: customksztalt.png 	  name: shoes     type: SHOES       strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 100
+id: 513 img: customksztalt.png    name: weapon    type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 629 img: customksztalt.png    name: necklace  type: NECKLACE    strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 729 img: customksztalt.png    name: belt      type: BELT        strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 812 img: customksztalt.png    name: ring      type: RING        strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 100 img: customksztalt.png    name: slot1     type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 200 img: customksztalt.png    name: slot2     type: RING        strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 300 img: customksztalt.png    name: slot3     type: BELT        strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 400 img: customksztalt.png    name: slot4     type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 500 img: customksztalt.png    name: slot5     type: HELMET      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 100
+id: 600 img: customksztalt.png    name: slot6     type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 700 img: customksztalt.png    name: slot7     type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0
+id: 800 img: customksztalt.png    name: slot8     type: WEAPON      strength: 10 dexterity: 20 intelligence: 90 constitution: 87 luck: 21 armor: 0

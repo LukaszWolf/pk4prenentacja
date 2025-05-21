@@ -1,0 +1,1 @@
+login: player1 shop1: 629 shop2: 000 shop3: 729 shop3: 000 shop5:000

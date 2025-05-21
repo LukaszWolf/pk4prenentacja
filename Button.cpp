@@ -1,0 +1,420 @@
+﻿#include "Button.h"
+#include"Player.h"
+#include <iostream>
+
+Button::Button() {};
+
+
+Button::Button(sf::Vector2f position, sf::Vector2f size, std::string texture_file_name_default, std::function<void()>action)
+    :onClickFunction(action)
+{
+    if (!tex.loadFromFile(texture_file_name_default) and texture_file_name_default != "") {
+        std::cerr << "Nie mo�na za�adowa� tekstury: " << texture_file_name_default << std::endl;
+    }
+    else if (texture_file_name_default == "") {
+        shape.setTexture(nullptr);
+    }
+    else {
+        shape.setTexture(&tex);
+    }
+
+    if (size.x == 0.f and size.y == 0.f) {
+        sf::Vector2f ts = static_cast<sf::Vector2f>(tex.getSize());
+        size = ts;
+    }
+    // TEKSTURA
+    shape.setSize(size);
+    shape.setPosition(position);
+    // shape.setFillColor(defaultColor); // Kolor awaryjny, gdyby tekstura si� nie za�adowa�a
+    shape.setFillColor(sf::Color::White); // Ustawienie jednolitego t�a, aby unikn�� przenikania
+    // �adowanie tekstury
+    
+
+    /////HOVER
+    hover.setSize(size);
+    hover.setPosition(position);
+    hover.setFillColor(sf::Color(255, 255, 255, 0)); // Domy�lnie przezroczysty
+}
+
+
+Button::Button(const std::string& label, sf::Vector2f position, sf::Vector2f size, std::string texture_file_name_default)
+{
+    
+    
+    
+    // TEKSTURA
+    
+    
+    if (!tex.loadFromFile(texture_file_name_default) and texture_file_name_default != "") {
+        std::cerr << "Nie mo�na za�adowa� tekstury: " << texture_file_name_default << std::endl;
+    }
+    else if (texture_file_name_default == "") {
+        shape.setTexture(nullptr);
+    }
+    else {
+        shape.setTexture(&tex);
+    }
+    if (size.x == 0.f and size.y == 0.f) {
+        sf::Vector2f ts = static_cast<sf::Vector2f>(tex.getSize());
+        size = ts;
+    }
+    shape.setSize(size);
+    shape.setPosition(position);
+    // shape.setFillColor(defaultColor); // Kolor awaryjny, gdyby tekstura si� nie za�adowa�a
+    shape.setFillColor(sf::Color::White); // Ustawienie jednolitego t�a, aby unikn�� przenikania
+    // �adowanie tekstury
+    
+    //setText(label);
+    /////HOVER
+    hover.setSize(size);
+    hover.setPosition(position);
+    hover.setFillColor(sf::Color(255, 255, 255, 0)); // Domy�lnie przezroczysty
+}
+
+
+void Button::setText(const std::string& label) {
+    text.setString(label);
+}
+
+void Button::setPosition(sf::Vector2f position) {
+    shape.setPosition(position);
+    text.setPosition(position.x + 10, position.y + 10);
+}
+
+void Button::setSize(sf::Vector2f size) {
+    shape.setSize(size);
+}
+
+void Button::setColor(sf::Color color) {
+    defaultColor = color;
+    shape.setFillColor(defaultColor);
+}
+
+void Button::setHover(sf::Color hover) {
+    hoverColor = hover;
+}
+
+void Button::setFont()
+{
+    if (!font.loadFromFile("kobani.ttf")) {
+        std::cout << "Nie mo�na za�adowa� czcionki!" << std::endl;
+    }
+    this->font = font;
+}
+
+void Button::setTex(std::string texture_file_name)
+{
+
+    if (!this->tex.loadFromFile(texture_file_name)) {
+        std::cout << "Nie mo�na za�adowa� tekstury: " << texture_file_name << std::endl;
+    }
+
+}
+
+
+
+
+void Button::draw(sf::RenderWindow& window) {
+    window.draw(shape);
+    window.draw(hover);
+    window.draw(text);
+}
+
+void Button::handleEvents(sf::Vector2i mouse_pos, sf::Event event)
+{
+    if (this->isClicked(mouse_pos, event)) {
+        if (onClickFunction) {
+            onClickFunction();
+        }
+    }
+    if (this->isHovered(mouse_pos)) {
+        hover.setFillColor(sf::Color(255, 255, 255, 40));
+        hover.setPosition(this->shape.getPosition());
+    }
+    else {
+        hover.setFillColor(sf::Color(255, 255, 255, 0));
+    }
+
+}
+
+bool Button::isHovered(sf::Vector2i mousePos) {
+    sf::FloatRect bounds = shape.getGlobalBounds();
+    bool isHover = bounds.contains(static_cast<sf::Vector2f>(mousePos));
+
+    return isHover;
+    /*
+        if (shape.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
+            hover.setFillColor(sf::Color(255, 255, 255, 40)); // Lekko bia�a nak�adka (przezroczysto�� = 100)
+            return true;
+        }
+        else {
+            hover.setFillColor(sf::Color(255, 255, 255, 0)); // Lekko bia�a nak�adka (przezroczysto�� = 100)
+            return false;
+        }
+        */
+}
+
+bool Button::isClicked(sf::Vector2i mousePos, sf::Event event) {
+    return isHovered(mousePos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left;
+}
+
+sf::Texture Button::getTex()
+{
+    return this->tex;
+}
+
+sf::Vector2f Button::getPosition()
+{
+    return this->shape.getPosition();
+}
+
+
+
+
+
+
+
+//////////////////ITEMSLOT
+
+
+
+ItemSlot::ItemSlot(std::string slot_name, sf::Vector2f position, sf::Vector2f size, ItemType item_type, std::string texture_file_name_default, std::function<void()>action, Item* curr_item) :
+    Button(), allowed_item_type(item_type)
+{
+    name_id = slot_name;
+    isItemDragged = false;
+    isDragSource = false;
+    this->setItem(curr_item);
+    this->onClickFunction = action;
+    setItem(current_item);
+    setPosition(position);
+    setSize(size);
+    if (!tex.loadFromFile(texture_file_name_default) and texture_file_name_default != "") {
+        std::cerr << "Nie mo�na za�adowa� tekstury: " << texture_file_name_default << std::endl;
+    }
+    else if (texture_file_name_default == "") {
+        shape.setTexture(nullptr);
+    }
+    else {
+        shape.setTexture(&tex);
+    }
+    hover.setSize(size);
+    hover.setPosition(position);
+    hover.setFillColor(sf::Color(255, 255, 255, 0)); // Domy�lnie przezroczysty
+   // if (current_item != nullptr) {
+     //   this->current_item->sprite.setTexture(current_item->texture);
+       // this->current_item->sprite.setScale(0.5f, 0.5f);
+        //this->current_item->setPosition(position);
+    //}
+
+}
+
+void ItemSlot::setItem(Item* item)
+{
+    //nowy item to trzeba go ustawic w dobrym miejscu
+  
+    this->current_item = item;
+    if (this->current_item) {
+        this->current_item->setPosition(this->getPosition());
+        this->current_item->getSprite().setTexture(current_item->getTexture());
+        this->current_item->getSprite().setScale(0.5f, 0.5f);
+
+        //trzeba dodac zeby w equipment w game albo w player sie zmienialo , lepiej w player
+    }
+   
+    
+    
+    //std::cout<<"NOWY itemek dadadadadd" << this->current_item->getGlobalBounds().getPosition().x;
+    //dodac sprawdzanie czy pasuje typ itemu
+
+}
+
+ItemType ItemSlot::getAllowedItemType()
+{
+    return allowed_item_type;
+}
+
+Item* ItemSlot::getCurrentItem()
+{
+    return current_item;
+}
+// ItemSlot.h, w public:
+    /// Zwraca prostokątny obszar slotu (do testów hover / drop)
+
+
+bool ItemSlot::getIsItemDragged()
+{
+    return isItemDragged;
+}
+
+std::string ItemSlot::getNameID() {
+    return name_id;
+}
+void ItemSlot::setIsItemDragged(bool dragging)
+{
+    isItemDragged = dragging;
+}
+
+void ItemSlot::moveItem(sf::Vector2f& diff)
+{
+    // jeżeli jest jakiś item i wciśnięty jest lewy przycisk myszy
+    if (current_item) {
+        current_item->getSprite().move(diff);
+      //  std::cout << "Moved item by x:" << diff.x << " y:" << diff.y << std::endl;
+    }
+}
+
+sf::FloatRect ItemSlot::getGlobalBounds() const
+{
+    return shape.getGlobalBounds();
+}
+
+void ItemSlot::draw(sf::RenderWindow& window)
+{
+  //  window.draw(shape);
+    
+    window.draw(this->hover);
+
+    if (this->current_item != nullptr) {
+        //   if (current_item->isNewPosition()) {
+        
+  //      this->current_item->sprite.setScale(0.5f, 0.5f);
+    //    this->current_item->setPosition(this->getPosition());
+
+      //  this->current_item->sprite.setTexture(current_item->texture);
+        // }
+
+        window.draw(this->current_item->getSprite());
+       
+        //  this->current_item->sprite.setColor(sf::Color::Yellow);
+
+    }
+    
+}
+void ItemSlot::tryStartDrag(const sf::Vector2i& mousePos, const sf::Event& event) {
+    if (event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        Item* item = getCurrentItem();
+        if (!isDragSource && item &&
+            item->getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos)))
+        {
+            isDragSource = true;
+            isItemDragged = true;
+            last_mouse_pos = mousePos;
+            std::cout << "Start drag item " << item->getId() << std::endl;
+        }
+    }
+}
+void ItemSlot::swapItems(ItemSlot* source, ItemSlot* target, Player* loggedInUser) {
+    std::cout << "ZAMIENIONO ITEMY\n";
+
+    Item* temp = source->getCurrentItem();
+
+    // Jeśli kupujemy (source=shop), nie zamieniamy, tylko przenosimy
+    if (source->getNameID().rfind("shop", 0) == 0) {
+        target->setItem(temp);
+        source->setItem(nullptr);
+        if (loggedInUser && temp) {
+            int cena = temp->getPrice();
+            loggedInUser->setGold(loggedInUser->getGold() - cena);
+            std::cout << "[KUPNO] -" << cena << " gold\n";
+        }
+        if (loggedInUser) {
+            loggedInUser->setItem(target->getNameID(), target->getCurrentItem());
+            loggedInUser->setItem(source->getNameID(), nullptr);
+        }
+        return;
+    }
+
+    // Inne: zamiana miejscami
+    source->setItem(target->getCurrentItem());
+    target->setItem(temp);
+
+    if (loggedInUser) {
+        loggedInUser->setItem(source->getNameID(), source->getCurrentItem());
+        loggedInUser->setItem(target->getNameID(), target->getCurrentItem());
+    }
+}
+
+
+void ItemSlot::cancelDrag() {
+    isItemDragged = false;
+    isDragSource = false;
+}
+bool ItemSlot::endDrag(const sf::Vector2i& mousePos,
+    const sf::Event& event,
+    ItemSlot* source,
+    Player* loggedInUser)
+{
+    // 1) Tylko na zwolnienie lewego przycisku
+    if (event.type != sf::Event::MouseButtonReleased ||
+        event.mouseButton.button != sf::Mouse::Left)
+    {
+        return false;
+    }
+
+    // 2) Musi być faktycznie drag z innego slotu
+    if (!source->getIsItemDragged() || source == this)
+        return false;
+
+    // 3) Kursor musi być nad tym slotem
+    if (!this->isHovered(mousePos))
+        return false;
+
+    // 4) Nie obsługujemy swapów ze slotu sklepu ani na slot sklepu
+    bool srcIsShop = (source->getNameID().rfind("shop", 0) == 0);
+    bool dstIsShop = (this->getNameID().rfind("shop", 0) == 0);
+    if (srcIsShop || dstIsShop)
+        return false;
+
+    // 5) Musi istnieć przedmiot źródłowy
+    Item* srcItem = source->getCurrentItem();
+    if (!srcItem)
+        return false;
+
+    // 6) Kompatybilność: srcItem → this slot
+    if (allowed_item_type != ItemType::ANY &&
+        srcItem->getType() != allowed_item_type)
+    {
+        return false;
+    }
+
+    // 7) Kompatybilność: dstItem → source slot
+    Item* dstItem = this->getCurrentItem();
+    ItemType srcAllowed = source->getAllowedItemType();
+    if (dstItem &&
+        srcAllowed != ItemType::ANY &&
+        dstItem->getType() != srcAllowed)
+    {
+        return false;
+    }
+
+    // 8) Wszystko gra — zamień przedmioty
+    swapItems(source, this, loggedInUser);
+    return true;
+}
+
+
+void ItemSlot::handleEvents(sf::Vector2i mouse_pos, sf::Event event){
+//if (!isItemDragged) {
+    // hover effect when not dragging
+    if (this->isHovered(mouse_pos)) {
+        hover.setFillColor(sf::Color(255, 255, 255, 40));
+        hover.setPosition(this->shape.getPosition());
+    }
+    else {
+        hover.setFillColor(sf::Color(255, 255, 255, 0));
+    }
+//}
+//else {
+    // while dragging, move the sprite
+    if (getIsItemDragged()) {
+    sf::Vector2i delta = mouse_pos - last_mouse_pos;
+    sf::Vector2f diff(static_cast<float>(delta.x), static_cast<float>(delta.y));
+    moveItem(diff);
+    }
+//}
+last_mouse_pos = mouse_pos;
+
+}
