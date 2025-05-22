@@ -75,23 +75,20 @@ std::string Game::formatEquipmentLine(Player*p) {
         << " shop2: " << (p->getItem("shop2") ? std::to_string(p->getItem("shop2")->getId()) : "000")
         << " shop3: " << (p->getItem("shop3") ? std::to_string(p->getItem("shop3")->getId()) : "000")
         << " shop4: " << (p->getItem("shop4") ? std::to_string(p->getItem("shop4")->getId()) : "000")
-        << " shop5: " << (p->getItem("shop5") ? std::to_string(p->getItem("shop5")->getId()) : "000");
+        << " shop5: " << (p->getItem("shop5") ? std::to_string(p->getItem("shop5")->getId()) : "000")
+        << " shop6: " << (p->getItem("shop6") ? std::to_string(p->getItem("shop6")->getId()) : "000");
 
     return oss.str();
-    //login: player1 helmet: 120 shield: 217 trousers: 328 shoes: 401 weapon: 513 necklace: 000 belt: 000 ring: 
-    // 812 luckyitem: 000 slot1: 100 slot2: 0 slot3: 200 slot4: 000 slot5: 600 slot6: 700 slot7: 000 slot8: 900 shop1: 629 shop2: 000 shop3: 729 shop4: 000 shop5: 000
 }
 
 void Game::saveToFileStats() {
     const std::string fileName = "accounts.txt";
     std::ifstream in(fileName);
     if (!in.is_open()) {
-        // Możesz rzucić wyjątek lub tylko zalogować błąd:
-        std::cerr << "Nie można otworzyć pliku do odczytu: " << fileName << "\n";
+        std::cout << "Nie można otworzyć pliku do odczytu: " << fileName << std::endl;
         return;
     }
 
-    // 1) Wczytaj wszystkie linie do wektora
     std::vector<std::string> lines;
     std::string line;
     while (std::getline(in, line)) {
@@ -101,10 +98,8 @@ void Game::saveToFileStats() {
     }
     in.close();
 
-    // 2) Przygotuj nową linijkę dla zalogowanego gracza
     std::string newLine = formatPlayerLine(loggedInPlayer);
 
-    // 3) Podmień istniejącą linijkę lub dodaj na końcu
     bool replaced = false;
     std::string prefix = "login: " + loggedInPlayer->getName() + " ";
     for (auto& ln : lines) {
@@ -118,10 +113,9 @@ void Game::saveToFileStats() {
         lines.push_back(newLine);
     }
 
-    // 4) Zapisz wszystkie linie z powrotem, nadpisując plik
     std::ofstream out(fileName, std::ios::trunc);
     if (!out.is_open()) {
-        std::cerr << "Nie można otworzyć pliku do zapisu: " << fileName << "\n";
+        std::cout << "Nie można otworzyć pliku do zapisu: " << fileName <<std::endl;
         return;
     }
     for (const auto& ln : lines) {
@@ -133,14 +127,13 @@ void Game::saveToFileStats() {
 void Game::saveToFileEquipment() {
     const std::string fileName = "equipments.txt";
 
-    // 1) Otwórz do odczytu
+    
     std::ifstream in(fileName);
     if (!in.is_open()) {
-        std::cerr << "Nie można otworzyć pliku do odczytu: " << fileName << "\n";
+        std::cout << "Nie można otworzyć pliku do odczytu: " << fileName << std::endl;
         return;
     }
 
-    // 2) Wczytaj wszystkie niepuste linie
     std::vector<std::string> lines;
     std::string line;
     while (std::getline(in, line)) {
@@ -150,10 +143,8 @@ void Game::saveToFileEquipment() {
     }
     in.close();
 
-    // 3) Przygotuj nową linijkę dla gracza
     std::string newLine = formatEquipmentLine(loggedInPlayer);
 
-    // 4) Spróbuj podmienić istniejącą, albo dodaj nową
     bool replaced = false;
     const std::string prefix = "login: " + loggedInPlayer->getName() + " ";
     for (auto& ln : lines) {
@@ -167,10 +158,9 @@ void Game::saveToFileEquipment() {
         lines.push_back(newLine);
     }
 
-    // 5) Zapisz wszystko z powrotem (nadpisując plik)
     std::ofstream out(fileName, std::ios::trunc);
     if (!out.is_open()) {
-        std::cerr << "Nie można otworzyć pliku do zapisu: " << fileName << "\n";
+        std::cout << "Nie można otworzyć pliku do zapisu: " << fileName << std::endl;
         return;
     }
     for (const auto& ln : lines) {
@@ -179,7 +169,6 @@ void Game::saveToFileEquipment() {
     out.close();
 }
 
-//public
 Game::Game() {
     this->initVariables();
     this->initWindow();
@@ -219,20 +208,17 @@ void Game::pollEvents() {
     while (this->window->pollEvent(this->event)) {
         if (this->event.type == sf::Event::KeyPressed) {
             if (this->event.key.code == sf::Keyboard::Escape) {
-                // Akcja po naciœniêciu klawisza Escape
-                this->window->close();  // Na przyk³ad zamkniêcie gry
+                this->window->close();
             }
         }
         
 
-        switch (this->page) { // to cbyba bez sensu
+        switch (this->page) { 
         case GameState::LOGIN_PAGE:
             this->login_Screen->handleEvents(this->event, *this->window);
             break;
         case GameState::PLAYER_MENU:
-
-            //this->tavern_screen->handleEvents(this->event, *this->window);
-            this->player_menu_screen->handleEvents(this->event, *this->window); ///to do przeniesienia w inne miejsce potem
+            this->player_menu_screen->handleEvents(this->event, *this->window); 
             break;
         default:
             break;
@@ -288,10 +274,9 @@ void Game::LogOut(){
             if (item != nullptr) {
 
                 delete item;
-                std::cout << "Usuniêto przedmiot z slotu: " << slot << std::endl;
+           
             }
 
-            // Ustawienie slotu na nullptr
             loggedInPlayer->setItem(slot, nullptr);
         }
     }

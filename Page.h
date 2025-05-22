@@ -16,6 +16,7 @@
 #include "NavBar.h"
 #include <iomanip>
 #include "DescriptionBox.h"
+#include<random>
 class Game;
 
 class Page {
@@ -93,7 +94,8 @@ private:
     ItemSlot* shop_slot3;
     ItemSlot* shop_slot4;
     ItemSlot* shop_slot5;
-
+    ItemSlot* shop_slot6;
+    Button* refresh_shop_btn;
    
     std::vector<ItemSlot*> allSlots;
     ItemSlot* dragSource = nullptr;
@@ -134,6 +136,8 @@ public:
     void updateSlots();
     void updateTextStats();
     void setLoggedInUser(Player* player);
+    void assignRandomStats(int& strength, int& dexterity, int& intelligence, int& durability, int& luck, int& armor);
+    void refreshShop();
 };
 
 #endif

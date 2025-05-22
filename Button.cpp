@@ -170,7 +170,7 @@ void ItemSlot::setItem(Item* item){
     if (this->current_item) {
         this->current_item->setPosition(this->getPosition());
         this->current_item->getSprite().setTexture(current_item->getTexture());
-        this->current_item->getSprite().setScale(0.5f, 0.5f);
+        this->current_item->getSprite().setScale(1.f, 1.f);
 
     }
 }

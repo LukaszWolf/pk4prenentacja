@@ -19,7 +19,7 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
   //  this->weapon_effect_area = new ItemSlot({ 802,484 }, { 126,126 }, ItemType::HELMET, "test.png", []() {}, nullptr);
     this->necklace_slot = new ItemSlot("necklace",{ 1004, 47 }, {129,129}, ItemType::NECKLACE, "test.png", []() {}, nullptr);
     this->belt_slot = new ItemSlot("belt", {1004, 198}, {129,129}, ItemType::BELT, "test.png", []() {}, nullptr);
-    this->ring_slot = new ItemSlot("ring",{ 1004, 339 }, {129,129}, ItemType::RING, "test.png", []() {}, nullptr);
+    this->ring_slot = new ItemSlot("ring",{ 1004, 349 }, {129,129}, ItemType::RING, "test.png", []() {}, nullptr);
     this->lucky_item_slot = new ItemSlot("luckyitem",{ 1004, 500 }, {129,129}, ItemType::LUCKY_ITEM, "test.png", []() {}, nullptr);
 
     this->bag_slot1 = new ItemSlot("slot1",{ 1251, 34 }, {129,129}, ItemType::ANY, "test.png", []() {}, nullptr);
@@ -36,6 +36,9 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
     this->shop_slot3 = new ItemSlot("shop3", { 1397, 824 }, { 129,129 }, ItemType::ANY, "test.png", []() {}, nullptr);
     this->shop_slot4 = new ItemSlot("shop4", { 1543, 824 }, { 129,129 }, ItemType::ANY, "test.png", []() {}, nullptr);
     this->shop_slot5 = new ItemSlot("shop5", { 1691, 824 }, { 129,129 }, ItemType::ANY, "test.png", []() {}, nullptr);
+    this->shop_slot6 = new ItemSlot("shop6", { 1691, 682 }, { 129,129 }, ItemType::ANY, "test.png", []() {}, nullptr);
+
+    this->refresh_shop_btn = new Button({ 1408, 690 }, { 260, 80 }, "shop_refresh_btn.png", [this]() {refreshShop(); });
 
     this->upgrade_strenght_btn = new Button({ 720, 703 }, { 0, 0 }, "upgrade_stat_button.png", []() {});
     this->upgrade_dexterity_btn = new Button({ 720, 796 }, { 0, 0 }, "upgrade_stat_button.png", []() {});
@@ -57,7 +60,7 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
     luck_text = new sf::Text("0", textfont, 20);
     armor_text = new sf::Text("0", textfont, 20);
 
-    gold_text = new sf::Text("0", textfont, 20);
+    gold_text = new sf::Text("0", textfont, 28);
     level_text = new sf::Text("0", textfont, 28);
 
     strenght_related_text = new sf::Text("0", textfont, 20);
@@ -74,7 +77,7 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
     luck_text->setPosition({ 995,803 });
     armor_text->setPosition({ 995,896 });
 
-    gold_text->setPosition({ 1700,400 });
+    gold_text->setPosition({ 1698,388 });
     level_text->setPosition({ 730,430 });
 
     strenght_related_text->setPosition({ 675,735 });
@@ -104,13 +107,9 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
    
 
 
-    descriptionBox = new DescriptionBox(textfont, 20);  // dobierz rozmiar czcionki
-    descriptionBox->setPosition({ 0,0 });                 // opcjonalnie pozycja domyślna
+    descriptionBox = new DescriptionBox(textfont, 20);  
+    descriptionBox->setPosition({ 0,0 });          
     descriptionBox->setVisible(false);
-
-    
-
-    ////////dodac sloty z plecaka
 
     allSlots = {
     helmet_slot,
@@ -134,7 +133,8 @@ PlayerMenu::PlayerMenu(Game& game) : Page(game) {
     shop_slot2,
     shop_slot3,
     shop_slot4,
-    shop_slot5
+    shop_slot5,
+    shop_slot6
     };
 
     updateSlots();
@@ -146,7 +146,7 @@ PlayerMenu::~PlayerMenu() {
     delete this->navBar;
     delete this->player_managment_area;
     delete this->player_image;
-
+    delete this->refresh_shop_btn;
     delete this->helmet_slot;
     delete this->armor_slot;
     delete this->gloves_slot;
@@ -166,6 +166,12 @@ PlayerMenu::~PlayerMenu() {
     delete this->bag_slot7;
     delete this->bag_slot8;
 
+    delete this->shop_slot1;
+    delete this->shop_slot2;
+    delete this->shop_slot3;
+    delete this->shop_slot4;
+    delete this->shop_slot5;
+    delete this->shop_slot6;
 
     delete this->upgrade_strenght_btn;
     delete this->upgrade_dexterity_btn;
@@ -207,8 +213,8 @@ void PlayerMenu::draw(sf::RenderWindow& window) {
         }
     }
 
-    this->descriptionBox->draw(window);
-
+    
+    this->refresh_shop_btn->draw(window);
 
     if (upgrade_strenght_btn) {
         upgrade_strenght_btn->draw(window);
@@ -272,14 +278,14 @@ void PlayerMenu::draw(sf::RenderWindow& window) {
         window.draw(*level_text);
     }
     if (img_shape) {
-        window.draw(*img_shape);
+      //  window.draw(*img_shape);
     }
-
+    this->descriptionBox->draw(window);
 }
 
 
 void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
-    sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
+    sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
 
     // 1) NavBar
     if (navBar) {
@@ -289,7 +295,7 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed and
         event.mouseButton.button == sf::Mouse::Left){
         for (auto slot : allSlots) {
-            slot->tryStartDrag(mousePixel, event);
+            slot->tryStartDrag(mouse_pos, event);
             if (slot->getIsItemDragged()) {
                 dragSource = slot;
                 break;
@@ -304,7 +310,7 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
         sf::IntRect shopArea(1200, 370, 720, 710);
         ItemSlot* hoverSlot = nullptr;
         for (auto slot : allSlots) {
-            if (slot->isHovered(mousePixel)) {
+            if (slot->isHovered(mouse_pos)) {
                 hoverSlot = slot;
                 break;
             }
@@ -356,7 +362,7 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
                 return;
             }
             // jeśli źródło nie jest sklepem zwykly swap
-            bool swapped = hoverSlot->endDrag(mousePixel, event, dragSource, loggedInUser);
+            bool swapped = hoverSlot->endDrag(mouse_pos, event, dragSource, loggedInUser);
             if (swapped) {
                 updateSlots();
                 dragSource->cancelDrag();
@@ -373,7 +379,7 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
         }
 
  // Upuszczenie poza sloty, ale w obszarze sklepu , sprzedaz albo powrot
-        if (shopArea.contains(mousePixel)) {
+        if (shopArea.contains(mouse_pos)) {
             if (dragSource->getNameID().rfind("shop", 0) == 0) {
             }
             else {
@@ -401,13 +407,15 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
     }
 
     for (auto slot : allSlots) {
-        slot->handleEvents(mousePixel, event);
+        slot->handleEvents(mouse_pos, event);
     }
-
-    //opis
+    if (refresh_shop_btn) {
+        refresh_shop_btn->handleEvents(mouse_pos, event);
+    }
+//opis
     ItemSlot* hovered = nullptr;
     for (auto slot : allSlots)
-        if (slot->isHovered(mousePixel))
+        if (slot->isHovered(mouse_pos))
             hovered = slot;
     if (hovered && hovered->getCurrentItem()) {
         descriptionBox->setItem(hovered->getCurrentItem());
@@ -421,36 +429,36 @@ void PlayerMenu::handleEvents(sf::Event event, sf::RenderWindow& window) {
     if (loggedInUser) {
     //ulepszanie statystyk
     if (upgrade_strenght_btn) {
-        upgrade_strenght_btn->handleEvents(mousePixel, event);
-        if (upgrade_strenght_btn->isClicked(mousePixel, event)) {
+        upgrade_strenght_btn->handleEvents(mouse_pos, event);
+        if (upgrade_strenght_btn->isClicked(mouse_pos, event)) {
             loggedInUser->upgradeStrength();
             updateTextStats();
         }
     }
     if (upgrade_dexterity_btn) {
-        upgrade_dexterity_btn->handleEvents(mousePixel, event);
-        if (upgrade_dexterity_btn->isClicked(mousePixel, event)) {
+        upgrade_dexterity_btn->handleEvents(mouse_pos, event);
+        if (upgrade_dexterity_btn->isClicked(mouse_pos, event)) {
             loggedInUser->upgradeDexterity();
             updateTextStats();
         }
     }
     if (upgrade_intelligence_btn) {
-        upgrade_intelligence_btn->handleEvents(mousePixel, event);
-        if (upgrade_intelligence_btn->isClicked(mousePixel, event)) {
+        upgrade_intelligence_btn->handleEvents(mouse_pos, event);
+        if (upgrade_intelligence_btn->isClicked(mouse_pos, event)) {
             loggedInUser->upgradeIntelligence();
             updateTextStats();
         }
     }
     if (upgrade_durability_btn) {
-        upgrade_durability_btn->handleEvents(mousePixel, event);
-        if (upgrade_durability_btn->isClicked(mousePixel, event)) {
+        upgrade_durability_btn->handleEvents(mouse_pos, event);
+        if (upgrade_durability_btn->isClicked(mouse_pos, event)) {
             loggedInUser->upgradeConstitution();
             updateTextStats();
         }
     }
     if (upgrade_luck_btn) {
-        upgrade_luck_btn->handleEvents(mousePixel, event);
-        if (upgrade_luck_btn->isClicked(mousePixel, event)) {
+        upgrade_luck_btn->handleEvents(mouse_pos, event);
+        if (upgrade_luck_btn->isClicked(mouse_pos, event)) {
             loggedInUser->upgradeLuck();
             updateTextStats();
         }
@@ -491,6 +499,7 @@ void PlayerMenu::updateSlots() {
         shop_slot3->setItem(loggedInUser->getItem("shop3"));
         shop_slot4->setItem(loggedInUser->getItem("shop4"));
         shop_slot5->setItem(loggedInUser->getItem("shop5"));
+        shop_slot6->setItem(loggedInUser->getItem("shop6"));
     }
 
     else {
@@ -504,7 +513,7 @@ void PlayerMenu::updateSlots() {
 void PlayerMenu::updateTextStats()
 {
     if (loggedInUser) {
-        gold_text->setString(std::to_string(loggedInUser->getGold()));
+        gold_text->setString("Monety: "+std::to_string(loggedInUser->getGold()));
         level_text->setString("Poziom "+std::to_string(loggedInUser->getLevel()));
     strength_text->setString(std::to_string(loggedInUser->getStrength()));
     dexterity_text->setString(std::to_string(loggedInUser->getDexterity()));
@@ -533,3 +542,134 @@ void PlayerMenu::setLoggedInUser(Player* player) {
     updateSlots();
     updateTextStats();
 }
+
+void PlayerMenu::assignRandomStats(int& strength,int& dexterity,int& intelligence,int& durability,int& luck,int& armor) {
+    static std::mt19937 rng{ std::random_device{}() };
+    std::uniform_int_distribution<int> distValue(0, 50);
+
+    std::vector<int*> stats = {&strength,&dexterity,&intelligence,&durability,&luck,&armor};
+
+    std::vector<int> indices(stats.size());
+    for (int i = 0; i < indices.size(); ++i) {
+        indices[i] = static_cast<int>(i);
+    }
+    std::shuffle(indices.begin(), indices.end(), rng);
+
+    for (int i = 0; i < 3; ++i) {
+        *stats[indices[i]] = distValue(rng);
+    }
+}
+
+
+
+void PlayerMenu::refreshShop() {
+    std::vector<int> ids;
+    int id;
+    std::string name;
+    std::string texture_path;
+    ItemType type;
+    int strength = 0;
+    int dexterity = 0;
+    int intelligence = 0;
+    int durability = 0;
+    int luck = 0;
+    int armor = 0;
+    int price = 0;
+
+    std::map < std::string, ItemSlot* > slots{
+        {"shop1",shop_slot1},
+        {"shop2",shop_slot2},
+        {"shop3",shop_slot3},
+        {"shop4",shop_slot4},
+        {"shop5",shop_slot5},
+        {"shop6",shop_slot6}, };
+    std::ifstream file("Items.txt");
+    if (!file.is_open()) {
+        std::cout << "Nie mozna otworzyc pliku items"<< std::endl;
+    }
+
+    std::string line;
+    const std::regex pattern(R"(^\s*id:\s*(\d+)\s+img:\s*([^\s]+)\s+name:\s*([^\s]+)\s+type:\s*([^\s]+)\s+strength:\s*(\d+)\s+dexterity:\s*(\d+)\s+intelligence:\s*(\d+)\s+durability:\s*(\d+)\s+luck:\s*(\d+)\s+armor:\s*(\d+)\s*$)");
+    std::smatch match;
+
+    while (std::getline(file, line)) {
+        if (std::regex_match(line, match, pattern)) {
+            ids.push_back(std::stoi(match[1].str()));
+        }
+    }
+
+    for (auto& slot : slots) {
+        strength = 0;
+        dexterity = 0;
+        intelligence = 0;
+        durability = 0;
+        luck = 0;
+        armor = 0;
+        price = 0;
+        id = 0;
+        for (int i = 100; i <= 999; ++i) {
+            bool conflict = false;
+            for (auto j : ids) {
+                if (i == j) {
+                    conflict = true;
+                    break;
+                }
+            }
+            if (!conflict) {
+                id = i;
+                ids.push_back(id);
+                break;
+            }
+        }
+        if (id == 0) {
+            throw std::runtime_error("Brak dostępnego ID");
+        }
+
+        name = "nazwa_itemu";
+        type = static_cast<ItemType>(std::rand() % static_cast<int>(ItemType::ANY));
+
+        switch (type) {
+        case ItemType::WEAPON:
+            texture_path = "strzala.png";
+            break;
+        case ItemType::ARMOR:
+            texture_path = "kolczatka.png";
+            break;
+        case ItemType::HELMET:
+            texture_path = "czapka.png";
+            break;
+        case ItemType::GLOVES:
+            texture_path = "rekawice.png";
+            break;
+        case ItemType::SHOES:
+            texture_path = "buty.png";
+            break;
+        case ItemType::RING:
+            texture_path = "pierscien.png";
+            break;
+        case ItemType::NECKLACE:
+            texture_path = "naszyjni.png";
+            break;
+        case ItemType::BELT:
+            texture_path = "pas.png";
+            break;
+        case ItemType::LUCKY_ITEM:
+            texture_path = "was.png";
+            break;
+        }
+    
+        assignRandomStats(strength, dexterity, intelligence, durability, luck, armor);
+        static std::mt19937 rng{ std::random_device{}() };
+        static std::uniform_int_distribution<int> dist(80, 250);
+        price = dist(rng);
+
+        Item* item = new Item(id, texture_path, name, type,strength, dexterity, intelligence,
+            durability, luck, armor, price);
+        slot.second->setItem(item);
+        loggedInUser->setItem(slot.first, slot.second->getCurrentItem());
+
+    }
+    loggedInUser->setGold(loggedInUser->getGold() - 10);
+    updateSlots();
+}
+

@@ -99,6 +99,7 @@ void Player::initEquipment()
 			{"shop3", nullptr},
 			{"shop4", nullptr},
 			{"shop5", nullptr},
+			{"shop6", nullptr},
 
     };
 }
@@ -156,15 +157,14 @@ void Player::updateEquipment(std::string filename)
 	std::string line;
 	bool found = false;
 
-	std::regex pattern(R"(login:\s*(\w+)\s+helmet:\s*(\d+)\s+shield:\s*(\d+)\s+trousers:\s*(\d+)\s+shoes:\s*(\d+)\s+weapon:\s*(\d+)\s+necklace:\s*(\d+)\s+belt:\s*(\d+)\s+ring:\s*(\d+)\s+luckyitem:\s*(\d+)\s+slot1:\s*(\d+)\s+slot2:\s*(\d+)\s+slot3:\s*(\d+)\s+slot4:\s*(\d+)\s+slot5:\s*(\d+)\s+slot6:\s*(\d+)\s+slot7:\s*(\d+)\s+slot8:\s*(\d+)\s+shop1:\s*(\d+)\s+shop2:\s*(\d+)\s+shop3:\s*(\d+)\s+shop4:\s*(\d+)\s+shop5:\s*(\d+))");
+	const std::regex pattern(R"(^login:\s*(\w+)\s+helmet:\s*(\d+)\s+shield:\s*(\d+)\s+trousers:\s*(\d+)\s+shoes:\s*(\d+)\s+weapon:\s*(\d+)\s+necklace:\s*(\d+)\s+belt:\s*(\d+)\s+ring:\s*(\d+)\s+luckyitem:\s*(\d+)\s+slot1:\s*(\d+)\s+slot2:\s*(\d+)\s+slot3:\s*(\d+)\s+slot4:\s*(\d+)\s+slot5:\s*(\d+)\s+slot6:\s*(\d+)\s+slot7:\s*(\d+)\s+slot8:\s*(\d+)\s+shop1:\s*(\d+)\s+shop2:\s*(\d+)\s+shop3:\s*(\d+)\s+shop4:\s*(\d+)\s+shop5:\s*(\d+)\s+shop6:\s*(\d+)\s*$)");
+
 
 	while (std::getline(file, line) and !found) {
-	
 		std::smatch match;
-		std::cout << std::endl << std::endl << std::endl;
 		if (std::regex_match(line, match, pattern)) {
 			if ((std::string(match[1]) == this->getName())) {
-				found = true;
+				
 				Item* helmet = (std::stoi(match[2]) != 0) ? new Item(std::stoi(match[2])) : nullptr;
 				Item* shield = (std::stoi(match[3]) != 0) ? new Item(std::stoi(match[3])) : nullptr;
 				Item* trousers = (std::stoi(match[4]) != 0) ? new Item(std::stoi(match[4])) : nullptr;
@@ -189,7 +189,7 @@ void Player::updateEquipment(std::string filename)
 				Item* shop3 = (std::stoi(match[21]) != 0) ? new Item(std::stoi(match[21])) : nullptr;
 				Item* shop4 = (std::stoi(match[22]) != 0) ? new Item(std::stoi(match[22])) : nullptr;
 				Item* shop5 = (std::stoi(match[23]) != 0) ? new Item(std::stoi(match[23])) : nullptr;
-
+				Item* shop6 = (std::stoi(match[24]) != 0) ? new Item(std::stoi(match[24])) : nullptr;
 
 				this->setItem("helmet", helmet);
 				this->setItem("shield", shield);
@@ -214,14 +214,15 @@ void Player::updateEquipment(std::string filename)
 				this->setItem("shop2", shop2);
 				this->setItem("shop3", shop3);
 				this->setItem("shop4", shop4);
-				this->setItem("shop5", shop5);	
+				this->setItem("shop5", shop5);
+				this->setItem("shop6", shop6);
+				found = true;
 			};
-
-			break; 
 		}
-		else {
-			std::cout << "nie udalo sie wczytac ekwipunku";
-		}
+		
+	}
+	if (!found) {
+		std::cout << "nie udalo sie wczytac ekwipunku";
 	}
 }
 void Player::printStats()

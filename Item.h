@@ -40,9 +40,8 @@ public:
     // Statystyki
 
     Item(int item_id);
-    Item(int id, const std::string& texturePath, const std::string& name, ItemType type, int strength, int dexterity,
-        int intelligence, int durability, int luck);
-
+    Item(int id, const std::string& texturePath, const std::string& name, ItemType type, int strength, int dexterity, int intelligence, int durability, int luck, int armor, int price);
+    std:: string ItemTypeToString(ItemType t);
     void setPosition(sf::Vector2f pos);
     sf::FloatRect getGlobalBounds() const;
     int getId() const;

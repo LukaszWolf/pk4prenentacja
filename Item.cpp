@@ -66,7 +66,62 @@ Item::Item(int item_id) : id(0), strength(0), dexterity(0), intelligence(0), dur
         std::cerr << "Nie znaleziono itemu o id: " << item_id << std::endl;
     }
 }
+Item::Item(int id,const std::string& texturePath,const std::string& name,ItemType type,int strength,
+    int dexterity,int intelligence,int durability,int luck,int armor,int price = 100): id(id),
+    name(name),type(type),strength(strength),dexterity(dexterity),intelligence(intelligence),durability(durability),
+    luck(luck),armor(armor),price(price){
+    if (!this->texture.loadFromFile(texturePath)) {
+        std::cerr << "Nie udalo sie wczytac textury: " << texturePath << std::endl;
+    }
+    else {
+        this->sprite.setTexture(this->texture);
+    }
+    this->sprite.setScale(2.f, 2.f);
 
+    std::ofstream out("Items.txt", std::ios::app);
+    if (out.is_open()) {
+        out
+            << "id: " << id
+            << " img: " << texturePath
+            << " name: " << name
+            << " type: " << ItemTypeToString(type)
+            << " strength: " << strength
+            << " dexterity: " << dexterity
+            << " intelligence: " << intelligence
+            << " durability: " << durability
+            << " luck: " << luck
+            << " armor: " << armor
+            << "\n";
+    }
+    else {
+        std::cout << "Nie mozna otworzyc pliku Items.txt do dopisania\n";
+    }
+}
+std::string Item::ItemTypeToString(ItemType t) {
+    switch (t) {
+    case ItemType::WEAPON:     
+        return "WEAPON";
+    case ItemType::ARMOR:      
+        return "ARMOR";
+    case ItemType::HELMET:     
+        return "HELMET";
+    case ItemType::GLOVES:     
+        return "GLOVES";
+    case ItemType::SHOES:      
+        return "SHOES";
+    case ItemType::RING:       
+        return "RING";
+    case ItemType::NECKLACE:   
+        return "NECKLACE";
+    case ItemType::BELT:       
+        return "BELT";
+    case ItemType::LUCKY_ITEM: 
+        return "LUCKY_ITEM";
+    case ItemType::ANY:
+        return "ANY";
+    }
+    return "ANY";
+}
 
 void Item::setPosition(sf::Vector2f pos) {
     sprite.setPosition(pos);

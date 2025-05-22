@@ -1,2 +1,2 @@
-login: player1 pass: haslo image: test.png strenght: 313 dexterity: 397 intelligence: 1644 durability: 1653 luck: 0 char_class: 0 level: 0 mount: 0 thirst: 88 gold: 2044 mushrooms: 87 hourglasses: 70
-login: player2 pass: haslo2 image: test2.png strenght: 109 dexterity: 30 intelligence: 28 durability: 83 luck: 0 char_class: 0 level: 0 mount: 0 thirst: 88 gold: 1180 mushrooms: 87 hourglasses: 70
+login: player1 pass: haslo image: test.png strenght: 319 dexterity: 397 intelligence: 1644 durability: 1658 luck: 5 char_class: 0 level: 0 mount: 0 thirst: 88 gold: 1469 mushrooms: 87 hourglasses: 70
+login: player2 pass: haslo image: test2.png strenght: 112 dexterity: 30 intelligence: 28 durability: 83 luck: 0 char_class: 0 level: 0 mount: 0 thirst: 88 gold: 669 mushrooms: 87 hourglasses: 70
