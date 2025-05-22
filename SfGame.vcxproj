@@ -159,51 +159,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Arena.cpp" />
-    <ClCompile Include="Barn.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="ContentArea.cpp" />
     <ClCompile Include="DescriptionBox.cpp" />
-    <ClCompile Include="Dungeons.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="LoginPage.cpp" />
-    <ClCompile Include="MagicShop.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="NavBar.cpp" />
     <ClCompile Include="Page.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerMenu.cpp" />
     <ClCompile Include="SfGame.cpp" />
-    <ClCompile Include="Tavern.cpp" />
     <ClCompile Include="TextBox.cpp" />
-    <ClCompile Include="WeaponsShop.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Arena.h" />
-    <ClInclude Include="Barn.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="ContentArea.h" />
     <ClInclude Include="DescriptionBox.h" />
-    <ClInclude Include="Dungeons.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Item.h" />
-    <ClInclude Include="LoginPage.h" />
-    <ClInclude Include="MagicShop.h" />
-    <ClInclude Include="Menu.h" />
     <ClInclude Include="NavBar.h" />
     <ClInclude Include="Page.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerMenu.h" />
-    <ClInclude Include="Tavern.h" />
     <ClInclude Include="TextBox.h" />
-    <ClInclude Include="WeaponsShop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

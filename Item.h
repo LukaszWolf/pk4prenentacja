@@ -30,7 +30,7 @@ private:
     int strength;
     int dexterity;
     int intelligence;
-    int constitution;
+    int durability;
     int luck;
     int armor;
     int price;
@@ -41,7 +41,7 @@ public:
 
     Item(int item_id);
     Item(int id, const std::string& texturePath, const std::string& name, ItemType type, int strength, int dexterity,
-        int intelligence, int constitution, int luck);
+        int intelligence, int durability, int luck);
 
     void setPosition(sf::Vector2f pos);
     sf::FloatRect getGlobalBounds() const;
@@ -57,8 +57,7 @@ public:
     int getArmor() const;
     std::string getName()const;
     std::vector <std::string> getDescriptionStrings();
-    void setDescriptionBoxVisibility(bool visibility);
-    int getPrice();
+    int getPrice() const;
 
 };
 #endif

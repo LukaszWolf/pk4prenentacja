@@ -24,24 +24,20 @@ void DescriptionBox::setItem(Item* item) {
         text.setFont(font);
         text.setCharacterSize(characterSize);
         text.setFillColor(sf::Color::White);
-
-        // Item name
         
             text.setString(item->getName());
             lines.push_back(text);
 
-            // Item type
-
             text.setString("Typ: "+typeToString(item->getType()));
             lines.push_back(text);
 
-            // Up to three non-zero stats
-            int count = 0;
             for (auto s : item->getDescriptionStrings()) {
                 text.setString(s);
                 lines.push_back(text);
             }
-        
+            text.setString("Cena: " + std::to_string(item->getPrice()));
+            lines.push_back(text);
+ 
         updateLayout();
     }
 }
@@ -52,7 +48,9 @@ void DescriptionBox::setPosition(const sf::Vector2f& pos) {
 }
 
 void DescriptionBox::draw(sf::RenderWindow& window) {
-    if (!visible) return;
+    if (!visible) {
+        return;
+    }
     window.draw(background);
     for (auto& line : lines) {
         window.draw(line);
@@ -77,15 +75,25 @@ void DescriptionBox::updateLayout() {
 
 std::string DescriptionBox::typeToString(ItemType t) const {
     switch (t) {
-    case ItemType::HELMET:      return "Helmet";
-    case ItemType::ARMOR:       return "Armor";
-    case ItemType::GLOVES:  return "Gloves";
-    case ItemType::SHOES:      return "Shoes";
-    case ItemType::WEAPON:       return "Weapon";
-    case ItemType::NECKLACE:  return "Necklace";
-    case ItemType::BELT:      return "Belt";
-    case ItemType::RING:       return "Ring";
-    case ItemType::LUCKY_ITEM:       return"Lucky item";
-    default:                    return "None";
+    case ItemType::HELMET:
+        return "Helmet";
+    case ItemType::ARMOR:
+        return "Armor";
+    case ItemType::GLOVES:
+        return "Gloves";
+    case ItemType::SHOES:
+        return "Shoes";
+    case ItemType::WEAPON:
+        return "Weapon";
+    case ItemType::NECKLACE:
+        return "Necklace";
+    case ItemType::BELT:
+        return "Belt";
+    case ItemType::RING:
+        return "Ring";
+    case ItemType::LUCKY_ITEM:
+        return"Lucky item";
+    default:
+        return "None";
     }
 }

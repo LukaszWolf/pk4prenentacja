@@ -5,8 +5,7 @@
 #include <string>
 #include<functional>
 #include "Item.h"
-
-#include "sstream"
+#include <sstream>
 
 class Player;
 class Button {
@@ -16,15 +15,12 @@ private:
     sf::Font font;
     sf::Color defaultColor;
 
-
-
 protected:
     sf::RectangleShape shape;
     sf::RectangleShape hover;
     sf::Texture tex;
     sf::Color hoverColor;
-    //bool visibility;
-    std::function<void()> onClickFunction;  // Funkcja lambda przechowywana w obiekcie
+    std::function<void()> onClickFunction;
 public:
     Button();
     Button(const std::string& label, sf::Vector2f position, sf::Vector2f size, std::string texture_file_name_default);
@@ -38,15 +34,11 @@ public:
     void setHover(sf::Color hover);
     void setFont();
     void setTex(std::string texture_file_name);
-
-    void triggerOnClick();
-
     bool isHovered(sf::Vector2i mousePos);
     bool isClicked(sf::Vector2i mousePos, sf::Event event);
 
-
-    sf::Texture getTex();
-    sf::Vector2f getPosition();
+    sf::Texture getTex() const;
+    sf::Vector2f getPosition() const;
 
 
 };
@@ -54,33 +46,27 @@ public:
 class ItemSlot : public Button {
 private:
     Item* current_item;
-    ItemType allowed_item_type; // Tylko np. bronie do slotu na bro�
+    ItemType allowed_item_type; 
     bool isItemDragged;
     bool isDragSource;
     sf::Vector2i last_mouse_pos;   
     std::string name_id;
 public:
     ItemSlot(std::string slot_name , sf::Vector2f position, sf::Vector2f size, ItemType item_type, std::string texture_file_name_default, std::function<void()>action, Item* curr_item); //eq
-    ItemSlot(sf::Vector2f position, sf::Vector2f size, std::string texture_file_name_default, std::function<void()>action); //plecak bo bez typu okreslonego
-    // void draw(sf::RenderWindow& window);
-     //bool canEquip(Item* item) const; //mozna dodac ze przy np zdobywaniu lvl dodaja sie sloty a inaczej sa zablokowane
-     //bool setItem(Item* item);
-     //Item* removeItem();
-     //Item* getItem() const;
+    
     void draw(sf::RenderWindow& window) override;
     void handleEvents(sf::Vector2i mouse_pos, sf::Event event);
-
     void tryStartDrag(const sf::Vector2i& mousePos, const sf::Event& event);
     void cancelDrag();
     bool endDrag(const sf::Vector2i& mousePos, const sf::Event& event, ItemSlot*source, Player*loggedInUSer);
     void swapItems(ItemSlot* source, ItemSlot* target, Player*loggedInUser);
 
-    std::string getNameID();
-    ItemType getAllowedItemType();
+    std::string getNameID() const;
+    ItemType getAllowedItemType() const;
     ItemType getSlotType() const;
     void setItem(Item* item);
-    Item* getCurrentItem();
-    bool getIsItemDragged();
+    Item* getCurrentItem() const;
+    bool getIsItemDragged() const;
     void setIsItemDragged(bool dragging);
     void moveItem(sf::Vector2f&diff);
     sf::FloatRect getGlobalBounds() const;

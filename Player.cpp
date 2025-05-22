@@ -1,6 +1,6 @@
 ﻿#include "Player.h"
 #include "Game.h"
-#include <cmath> // Do obliczeń statystyk
+#include <cmath> 
 
 Player::Player(std::string nam, std::string img, int str, int dex, int intel, int con, int lck, CharacterClass ch_cl, int lvl,
     Mount mnt, int tht, int gld, int mush, int hglass, Game&game):
@@ -9,57 +9,70 @@ mount(mnt), thirst_of_adventure(tht),gold(gld), mushrooms(mush), hourglasses(hgl
     initEquipment();
 }
 
-
-
 Player::~Player() {}
 
-// Implementacje metod wirtualnych
+void Player::upgradeStrength()
+{
+	this->base_strength++;
+	int cost = this->level;
+	this->setGold(gold-1);
+}
+
+void Player::upgradeDexterity()
+{
+	this->base_dexterity++;
+	int cost = this->level;
+	this->setGold(gold - 1);
+}
+void Player::upgradeIntelligence()
+{
+	this->base_intelligence++;
+	int cost = this->level;
+	this->setGold(gold - 1);
+}
+void Player::upgradeConstitution()
+{
+	this->base_durability++;
+	int cost = this->level;
+	this->setGold(gold - 1);
+}
+void Player::upgradeLuck()
+{
+	this->base_luck++;
+	int cost = this->level;
+	this->setGold(gold - 1);
+	
+}
+
 void Player::attack() {
   
 }
 
 int Player::calculateHP() {
-	return 1;
+	return durability*level;
 }
 
 int Player::calculateDamage() {
-	return 1;
+	return strength*level;
 }
 
 int Player::calculateEvasion() {
-	return 1;
+	return dexterity*level;
 }
 
 int Player::calculateResistance() {
-	return 1;
+	return intelligence*level*0.1;
 }
 
 int Player::calculateDamageReduction() {
-	return 1;
+	return std::floor(intelligence*level/50);
 }
 
 double Player::calculateCritChance() {
-	return 1;
-}
-
-// Implementacje metod specyficznych dla Player
-void Player::calculateXPtoNextLvl() {
-    
-}
-
-void Player::levelUp() {
-
-}
-
-void Player::upgradeStat() {
-
+	return std::max(50,(luck*0,05));
 }
 
 
-
-void Player::updateStats() {
-
-}
 
 void Player::initEquipment()
 {
@@ -89,7 +102,6 @@ void Player::initEquipment()
 
     };
 }
-// Getter – tylko do odczytu
 Item* Player::getItem(const std::string& slot_name) const {
     auto it = equipment.find(slot_name);
     if (it != equipment.end()) {
@@ -98,19 +110,10 @@ Item* Player::getItem(const std::string& slot_name) const {
     return nullptr;
 }
 
-// Setter – do ustawienia wskaźnika
 void Player::setItem(const std::string& slot_name, Item* item) {
-	//std::cout << "PRZEKAZANA NAZWA" << slot_name << std::endl;
-	//for (auto [i,a] : equipment) {
-		//std::cout << i << std::endl;
-	//}
     auto it = equipment.find(slot_name);
     if (it != equipment.end()) {
-        it->second = item;
-		std::cout << "changed" << std::endl;
-    }
-    else {
-        std::cerr << "Invalid slot name";
+		it->second = item;
     }
 	
 	if(!game_ref.getItemChangedFlag())
@@ -140,15 +143,8 @@ void Player::printEquipment() {
 }
 
 
-
-
-
-
-
 void Player::updateEquipment(std::string filename)
 {
-	//std::string name = login; // <-- tutaj wpisz nazwę gracza do wyszukania
-	
 	std::ifstream file(filename);
 	if (!file) {
 		std::cout << "nie udalo sie otworzyc pliku";
@@ -159,20 +155,16 @@ void Player::updateEquipment(std::string filename)
 	}
 	std::string line;
 	bool found = false;
-	// regex do dopasowania danych gracza
+
 	std::regex pattern(R"(login:\s*(\w+)\s+helmet:\s*(\d+)\s+shield:\s*(\d+)\s+trousers:\s*(\d+)\s+shoes:\s*(\d+)\s+weapon:\s*(\d+)\s+necklace:\s*(\d+)\s+belt:\s*(\d+)\s+ring:\s*(\d+)\s+luckyitem:\s*(\d+)\s+slot1:\s*(\d+)\s+slot2:\s*(\d+)\s+slot3:\s*(\d+)\s+slot4:\s*(\d+)\s+slot5:\s*(\d+)\s+slot6:\s*(\d+)\s+slot7:\s*(\d+)\s+slot8:\s*(\d+)\s+shop1:\s*(\d+)\s+shop2:\s*(\d+)\s+shop3:\s*(\d+)\s+shop4:\s*(\d+)\s+shop5:\s*(\d+))");
 
 	while (std::getline(file, line) and !found) {
-		//std::cout << line;
+	
 		std::smatch match;
 		std::cout << std::endl << std::endl << std::endl;
 		if (std::regex_match(line, match, pattern)) {
-			//std::cout << match[1] << ",,,,,," << game_ref.getLoggedInPlayer()->getName() << std::endl;
-			std::cout << match[1] << ",,,,,," << this->getName() << std::endl;
-			//if (std::string( match[1]) == std::string(game_ref.getLoggedInPlayer()->getImgName())) { //czemu to nie dzialaXD
 			if ((std::string(match[1]) == this->getName())) {
 				found = true;
-				//std::cout << "MATCH DZIALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
 				Item* helmet = (std::stoi(match[2]) != 0) ? new Item(std::stoi(match[2])) : nullptr;
 				Item* shield = (std::stoi(match[3]) != 0) ? new Item(std::stoi(match[3])) : nullptr;
 				Item* trousers = (std::stoi(match[4]) != 0) ? new Item(std::stoi(match[4])) : nullptr;
@@ -222,17 +214,13 @@ void Player::updateEquipment(std::string filename)
 				this->setItem("shop2", shop2);
 				this->setItem("shop3", shop3);
 				this->setItem("shop4", shop4);
-				this->setItem("shop5", shop5);
-				//player->printEquipment();
-								
+				this->setItem("shop5", shop5);	
 			};
 
-			break; // gracz znaleziony, koniec pętli
-			//player->printEquipment();
+			break; 
 		}
 		else {
 			std::cout << "nie udalo sie wczytac ekwipunku";
-			//	player->printEquipment();
 		}
 	}
 }
@@ -248,14 +236,13 @@ void Player::setGold(int amount)
 	std::cout << "gold: " << gold<<std::endl;
 }
 
-
 int Player::getStrength()
 {
 	int total = base_strength;
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getStrenght();
 	}
 	return total;
@@ -267,7 +254,7 @@ int Player::getDexterity()
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getDexterity();
 	}
 	return total;
@@ -279,7 +266,7 @@ int Player::getIntelligence()
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getIntelligence();
 	}
 	return total;
@@ -287,11 +274,11 @@ int Player::getIntelligence()
 
 int Player::getConstitution()
 {
-	int total = base_constitution;
+	int total = base_durability;
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getConstitution();
 	}
 	return total;
@@ -303,7 +290,7 @@ int Player::getLuck()
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getLuck();
 	}
 	return total;
@@ -314,18 +301,31 @@ int Player::getArmor() {
 	std::vector<std::string> slots = { "helmet","shield","trousers","shoes","weapon","necklace","belt","ring","luckyitem" };
 	for (const auto& slot : slots) {
 		auto it = equipment.find(slot);
-		if (it != equipment.end() && it->second)
+		if (it != equipment.end() and it->second)
 			total += it->second->getArmor();
 	}
 	return total;
 }
 
-
-
-// Pozostałe gettery pozostają bez zmian
-int Player::getMushrooms() { return mushrooms; }
-int Player::getHourglasses() { return hourglasses; }
-int Player::getGold() { return gold; }
-int Player::getThirst() { return thirst_of_adventure; }
-Mount Player::getMount() { return mount; }
+int Player::getMushrooms()const {
+	return mushrooms; 
+}
+int Player::getHourglasses() const{
+	return hourglasses; 
+}
+int Player::getGold() const{
+	return gold;
+}
+std::string Player::getPassword() const{
+	return password;
+}
+void Player::setPassword(std::string pass){
+	password = pass;
+}
+int Player::getThirst() const{
+	return thirst_of_adventure;
+}
+Mount Player::getMount() const{
+	return mount; 
+}
 

@@ -13,9 +13,6 @@ private:
     const sf::Color color;
     Game& game_ref;
 
-
-    //sf::Font font;  // Czcionka dla przycisków
-
 public:
     ContentArea(float width, float height, Game& game, const sf::Color& col);
     ContentArea(float width, float height, Game& game, const sf::Color& col, int x, int y);

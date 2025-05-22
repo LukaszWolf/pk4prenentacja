@@ -18,18 +18,15 @@ protected:
     int hp, damage, evasion, resistance, damage_reduction;
     double crit_chance;
     int level;
-    int base_strength, base_dexterity, base_intelligence, base_constitution, base_luck;
+    int base_strength, base_dexterity, base_intelligence, base_durability, base_luck;
     CharacterClass ch_class;
 
 public:
 
-
-    // Konstruktor (mo�e istnie� w klasie abstrakcyjnej)
-    Character(std::string nam, std::string img, int strength, int dexterity, int intelligence, int constitution,
+    Character(std::string nam, std::string img, int strength, int dexterity, int intelligence, int durability,
         int luck, CharacterClass ch_cl, int level);
-    virtual ~Character() = default; // Abstrakcyjna klasa musi mie� wirtualny destruktor
+    virtual ~Character() = default; 
 
-    // Czyste funkcje wirtualne (klasa abstrakcyjna)
     virtual void attack() = 0;
     virtual int calculateHP() = 0;
     virtual int calculateDamage() = 0;
@@ -38,8 +35,12 @@ public:
     virtual int calculateDamageReduction() = 0;
     virtual double calculateCritChance() = 0;
 
+    int getBaseStrenght() const;
+    int getBaseDexterity() const;
+    int getBaseIntelligence() const;
+    int getBaseConstitution() const;
+    int getBaseLuck() const;
 
-    // Gettery dla atrybut�w postaci
     std::string getImgName() const;
     std::string getName() const;
     int getLevel() const;
@@ -52,7 +53,5 @@ public:
     CharacterClass getCharacterClass() const;
 
 };
-
-
 
 #endif

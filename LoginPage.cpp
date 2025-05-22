@@ -4,14 +4,11 @@
 #include <iostream>
 
 LoginPage::LoginPage(Game& game) : Page(game) {
-   // this->was_account_added = false;
-    //this->login_box_size = { 700, 600 };
 
     this->content_box = new ContentArea(1920, 1080, game, "wybor_postaci.png", 0, 0);
     this->username_text_box = new TextBox(1370, 320, 354, 90, "Enter nickname");
     this->password_text_box = new TextBox(1370, 450, 354, 90, "Enter password");
     this->login_button = new Button("LOGIN", { 1390, 580 }, { 314, 80 }, "login_button.png");
-  //  this->register_button = new Button("REGISTER", { 1390, 680 }, { 314, 80 }, "przyc.png");
 }
 
 LoginPage::~LoginPage() {
@@ -19,7 +16,6 @@ LoginPage::~LoginPage() {
     delete this->username_text_box;
     delete this->password_text_box;
     delete this->login_button;
-//    delete this->register_button;
 
     for (auto btn : account_btns) {
         if (btn != nullptr) delete btn;
@@ -39,12 +35,6 @@ void LoginPage::draw(sf::RenderWindow& window) {
 
     if (this->login_button != nullptr)
         this->login_button->draw(window);
-
-  //  if (this->register_button != nullptr)
-    //    this->register_button->draw(window);
-
-    if (this->player_select_panel != nullptr)
-        this->player_select_panel->draw(window);
 
     for (const auto& player : insertion_order) {
         userToButtonMap[player]->draw(window);
@@ -71,17 +61,13 @@ void LoginPage::handleEvents(sf::Event event, sf::RenderWindow& window) {
         std::string pass = this->password_text_box->getText();
         std::string line = userExistLine(login, "accounts.txt");
 
-        std::cout << isValidLogin(login) << isPasswordMatched(pass, line) << std::endl;
+        if (isValidLogin(login) and isPasswordMatched(pass, line)) {
+            addAccountToAvailable(line, pass);
+            username_text_box->clearText();
+            password_text_box->clearText();
+        }
 
-        if (isValidLogin(login) && isPasswordMatched(pass, line)) {
-            addAccountToAvailable(line);
-        }
-        else {
-            std::cout << "nie da sie zalogowac" << std::endl;
-        }
     }
-
-
 
     if (this->username_text_box != nullptr)
         this->username_text_box->handleEvent(event);
@@ -122,11 +108,17 @@ bool LoginPage::isValidPassword(std::string password) {
 
 bool LoginPage::isPasswordMatched(std::string password, std::string line) {
     std::string to_find = "pass: " + password;
-    return isValidPassword(password) && line.find(to_find) != std::string::npos;
+    bool matched= isValidPassword(password) && line.find(to_find) != std::string::npos;
+    if (matched) {
+      
+        return true;
+    }
+      return false;
+
 }
 
-void LoginPage::addAccountToAvailable(std::string stats) {
-    std::regex pattern(R"(login:\s*(\w+)\s+pass:\s*(\w+)\s+image:\s*(\S+)\s+strenght:\s*(\d+)\s+dexterity:\s*(\d+)\s+intelligence:\s*(\d+)\s+constitution:\s*(\d+)\s+luck:\s*(\d+)\s+char_class:\s*(\d+)\s+level:\s*(\d+)\s+mount:\s*(\d+)\s+thirst:\s*(\d+)\s+gold:\s*(\d+)\s+mushrooms:\s*(\d+)\s+hourglasses:\s*(\d+))");
+void LoginPage::addAccountToAvailable(std::string stats, std::string password) {
+    std::regex pattern(R"(login:\s*(\w+)\s+pass:\s*(\w+)\s+image:\s*(\S+)\s+strenght:\s*(\d+)\s+dexterity:\s*(\d+)\s+intelligence:\s*(\d+)\s+durability:\s*(\d+)\s+luck:\s*(\d+)\s+char_class:\s*(\d+)\s+level:\s*(\d+)\s+mount:\s*(\d+)\s+thirst:\s*(\d+)\s+gold:\s*(\d+)\s+mushrooms:\s*(\d+)\s+hourglasses:\s*(\d+))");
     std::smatch matches;
 
     if (!std::regex_search(stats, matches, pattern)) return;
@@ -148,23 +140,40 @@ void LoginPage::addAccountToAvailable(std::string stats) {
 
     Player* new_player = new Player(login, image, str, dex, intel, con, luck, char_class,
         level, mount, thirst, gold, mushrooms, hourglasses,game_ref);
+    new_player->setPassword(password);
     insertion_order.push_front(new_player);
 
+    
+    if (insertion_order.size() > MAX_PLAYERS) {
+        // znajdź ostatniego
+        auto it = insertion_order.end();
+        --it;
+        Player* oldest = *it;
+        // usuń go z listy
+        insertion_order.erase(it);
+        // usuń przycisk
+        userToButtonMap.erase(oldest);
+        // zwolnij pamięć po Playerze, jeśli to konieczne
+        delete oldest;
+    }
+
+    // teraz ustaw pozycje przycisków dla do 6 graczy:
     float basePosX = 250;
     float spacingX = 270;
-    float baseposY = 280;
+    float basePosY = 280;
     float spacingY = 250;
     int i = 0;
-
     for (const auto& player : insertion_order) {
         int y = i / 3;
         int x = i % 3;
-        sf::Vector2f pos{ basePosX + (x * spacingX), baseposY + (y * spacingY) };
+        sf::Vector2f pos{ basePosX + x * spacingX, basePosY + y * spacingY };
 
         if (userToButtonMap.find(player) == userToButtonMap.end()) {
-            userToButtonMap[player] = std::make_unique<Button>(login, pos, sf::Vector2f{ 160, 160 }, image);
+            // tworzymy nowy przycisk
+            userToButtonMap[player] = std::make_unique<Button>(login, pos, sf::Vector2f{ 160,160 }, image);
         }
         else {
+            // tylko przesunięcie istniejącego
             userToButtonMap[player]->setPosition(pos);
         }
         ++i;
@@ -177,7 +186,8 @@ void LoginPage::updateEquipment(std::string filename, Player* player) {
 
 void LoginPage::LogIn(Player* player) {
     game_ref.setLoggedInPlayer(player);
-    game_ref.changePage(GameState::MENU);
+
+    game_ref.changePage(GameState::PLAYER_MENU);
    
     player->updateEquipment("equipments.txt");
 }

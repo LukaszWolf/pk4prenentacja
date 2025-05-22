@@ -31,13 +31,9 @@ public:
     void setBackgroundColor(const sf::Color& color);
     void setOutlineColor(const sf::Color& color);
     void setOutlineThickness(float thickness);
-    void setPlaceholder(const std::string& text);
-    void setPlaceholderColor(const sf::Color& color);
     void setPasswordMode(bool isPassword);
     void clearText();
     std::string getText() const;
-    bool isSelected() const;
-    void clear();
 
 
 };

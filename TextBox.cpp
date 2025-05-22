@@ -7,21 +7,18 @@ TextBox::TextBox(float x, float y, float width, float height, std::string defaul
         std::cout << "Nie mo¿na za³adowaæ czcionki!" << std::endl;
     }
 
-    this->text.setFont(font);  // Przypisz czcionkê
-    // Ustawienia kszta³tu
+    this->text.setFont(font);
     shape.setPosition(x, y);
     shape.setSize(sf::Vector2f(width, height));
     shape.setFillColor(sf::Color::White);
     shape.setOutlineThickness(2);
     shape.setOutlineColor(sf::Color(150, 150, 150));
-
-    // Ustawienia tekstu
+    
     text.setFont(font);
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::Black);
     text.setPosition(x + 5, y + (height - 20) / 2);
 
-    // Ustawienia placeholder
     placeholder.setFont(font);
     placeholder.setCharacterSize(20);
     placeholder.setFillColor(sf::Color(150, 150, 150));
@@ -39,13 +36,13 @@ void TextBox::handleEvent(const sf::Event& event) {
     }
 
     if (event.type == sf::Event::TextEntered && isSelectedFlag) {
-        if (event.text.unicode == '\b') { // Backspace
+        if (event.text.unicode == '\b') { //backspace
             if (!inputText.empty()) {
                 inputText.pop_back();
                 updateTextDisplay();
             }
         }
-        else if (event.text.unicode < 128 && (maxLength == 0 || inputText.size() < maxLength)) {
+        else if (event.text.unicode < 128 and (maxLength == 0 || inputText.size() < maxLength)) {
             inputText += static_cast<char>(event.text.unicode);
             updateTextDisplay();
         }
@@ -84,7 +81,7 @@ void TextBox::setCharacterSize(unsigned int size) {
     text.setCharacterSize(size);
     placeholder.setCharacterSize(size);
     sf::Vector2f pos = shape.getPosition();
-    sf::Vector2f boxSize = shape.getSize();  // Zmieniamy nazwê zmiennej na boxSize
+    sf::Vector2f boxSize = shape.getSize();  
     float textHeight = static_cast<float>(size);
     text.setPosition(pos.x + 5, pos.y + (boxSize.y - textHeight) / 2);
     placeholder.setPosition(pos.x + 5, pos.y + (boxSize.y - textHeight) / 2);
@@ -114,7 +111,7 @@ std::string TextBox::getText() const
 {
     return this->text.getString().toAnsiString();
 }
-void TextBox::updateTextDisplay() {  // Implementacja
+void TextBox::updateTextDisplay() {
     if (isPasswordMode && !inputText.empty()) {
         displayText = std::string(inputText.size(), '*');
         text.setString(displayText);
